@@ -168,11 +168,17 @@ if ( ! class_exists( 'acf_code_field' ) ) :
 
 			$atts['class'] = 'acf-code-field-box';
 
-			$e .= '<form method="POST" id="MyForm"><div id="monaco-editor"></div><input required type="hidden" id="text" name="text"></form>';
-
-			$e .= '<textarea ' . acf_esc_attr( $atts ) . ' >';
+			$e .= '<div id="MyForm">';
+			$e .= '<div id="monaco-editor"></div>';
+			$e .= '<textarea id="monaco-textarea" ' . acf_esc_attr( $atts ) . ' >';
 			$e .= esc_textarea( $field['value'] );
 			$e .= '</textarea>';
+			$e .= '</div>';
+
+
+			// $e .= '<textarea ' . acf_esc_attr( $atts ) . ' >';
+			// $e .= esc_textarea( $field['value'] );
+			// $e .= '</textarea>';
 			echo '<script>var value = "'.$field['value'].'";</script>';
 			
 			// ********************************************************************************************************************************************
@@ -185,49 +191,66 @@ if ( ! class_exists( 'acf_code_field' ) ) :
 					
 					  // your javscript code goes here markoscript
 			
-					  require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.27.0/min/vs' }});
+						require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.27.0/min/vs' }});
 				
-				require(['vs/editor/editor.main'], function() {
-					let theme = "vs";
-					if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-						theme = "vs-dark";
-					}
-					window.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
-						// value: "# Document Header\n\nEnter some text, submit the form with Ctrl-s or Cmd-s shortcut.",
-						value: value,
-						language: 'html',
-						// lineNumbers: "off",
-						wordWrap: "bounded",
-						wordWrapColumn: 100,
-						wrappingIndent: "same",
-						fontSize: 16,
-						roundedSelection: false,
-						scrollBeyondLastLine: false,
-						quickSuggestions: false,
-						minimap: {enabled:false},
-						theme: theme,
-					});
-				
-					// window.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
-					//     var inp = document.getElementById('text');
-					//     inp.value = window.editor.getValue();
-					//     document.forms['MyForm'].submit();
-					// });
-				
-					window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
-						if (e.matches) {
-							monaco.editor.setTheme("vs-dark");
-						} else {
-							monaco.editor.setTheme("vs");
-						}
-					})
-				
-					const divElem = document.getElementById('monaco-editor');
-					const resizeObserver = new ResizeObserver(entries => {
-						window.editor.layout();
-					});
-					resizeObserver.observe(divElem);
-				});		  
+						require(['vs/editor/editor.main'], function() {
+							let theme = "vs";
+							if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+								theme = "vs-dark";
+							}
+							window.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
+								// value: "# Document Header\n\nEnter some text, submit the form with Ctrl-s or Cmd-s shortcut.",
+								value: value,
+								language: 'html',
+								// lineNumbers: "off",
+								wordWrap: "bounded",
+								wordWrapColumn: 100,
+								wrappingIndent: "same",
+								fontSize: 16,
+								roundedSelection: false,
+								scrollBeyondLastLine: false,
+								quickSuggestions: false,
+								minimap: {enabled:false},
+								theme: theme,
+							});
+						
+							// window.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
+							//     var inp = document.getElementById('text');
+							//     inp.value = window.editor.getValue();
+							//     document.forms['MyForm'].submit();
+							// });
+						
+							window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+								if (e.matches) {
+									monaco.editor.setTheme("vs-dark");
+								} else {
+									monaco.editor.setTheme("vs");
+								}
+							})
+						
+							const divElem = document.getElementById('monaco-editor');
+							const resizeObserver = new ResizeObserver(entries => {
+								window.editor.layout();
+							});
+							resizeObserver.observe(divElem);
+						});		 
+						
+						// let src = window.editor.getValue()
+						// src.addEventListener('keyup', change, false);
+						
+						// function change(e) {
+						// 	document.getElementById("monaco-textarea").setAttribute('value', e.target.value);
+
+						// 	$("#code").val(value);
+						// }
+						
+						// let src = document.getElementById("monaco-editor");
+						// src.addEventListener('keyup', change, false);
+						
+						// function change(e) {
+						// 	document.getElementById("monaco-textarea").setAttribute('value', e.target.value);
+						// }
+
 					</script>
 				<?php
 			}
