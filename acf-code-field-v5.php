@@ -37,7 +37,7 @@ if ( ! class_exists( 'acf_code_field' ) ) :
 			*  label (string) Multiple words, can include spaces, visible when selecting a field type
 			*/
 
-			$this->label = __( 'Code area field', 'acf-code-field' );
+			$this->label = __( 'Code Area Field', 'acf-code-field' );
 
 
 			/*
@@ -53,7 +53,7 @@ if ( ! class_exists( 'acf_code_field' ) ) :
 
 			$this->defaults = array(
 				'mode'  => 'htmlmixed',
-				'theme' => 'monokai',
+				'theme' => 'vs-light',
 			);
 
 
@@ -129,7 +129,10 @@ if ( ! class_exists( 'acf_code_field' ) ) :
 				'instructions' => __( 'Themes can be previewed on the <a href="https://codemirror.net/demo/theme.html#default" target="_blank">codemirror website</a>', 'acf' ),
 				'type'         => 'select',
 				'name'         => 'theme',
-				'choices'      => $util->get_codemirror_themes(),
+				'choices'      => array(
+					'Visual Studio'               => __( "vs-light", 'acf' ),
+					'Visual Studio Dark'          => __( "vs-dark", 'acf' ),
+				),
 			) );
 		}
 
@@ -165,15 +168,80 @@ if ( ! class_exists( 'acf_code_field' ) ) :
 
 			$atts['class'] = 'acf-code-field-box';
 
+			$e .= '<form method="POST" id="MyForm"><div id="monaco-editor"></div><input required type="hidden" id="text" name="text"></form>';
+
 			$e .= '<textarea ' . acf_esc_attr( $atts ) . ' >';
 			$e .= esc_textarea( $field['value'] );
 			$e .= '</textarea>';
-			$e .= 'MarkoTestEditor<div id="codeeditor"></div><input required type="hidden" id="text" name="text">';
+			echo '<script>var value = "'.$field['value'].'";</script>';
+			
+			// ********************************************************************************************************************************************
+			// Add Monaco Script
+			// ********************************************************************************************************************************************
 
+			function ti_custom_javascript( ) {
+				?>
+					<script>
+					
+					  // your javscript code goes here markoscript
+			
+					  require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.27.0/min/vs' }});
+				
+				require(['vs/editor/editor.main'], function() {
+					let theme = "vs";
+					if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+						theme = "vs-dark";
+					}
+					window.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
+						// value: "# Document Header\n\nEnter some text, submit the form with Ctrl-s or Cmd-s shortcut.",
+						value: value,
+						language: 'html',
+						// lineNumbers: "off",
+						wordWrap: "bounded",
+						wordWrapColumn: 100,
+						wrappingIndent: "same",
+						fontSize: 16,
+						roundedSelection: false,
+						scrollBeyondLastLine: false,
+						quickSuggestions: false,
+						minimap: {enabled:false},
+						theme: theme,
+					});
+				
+					// window.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
+					//     var inp = document.getElementById('text');
+					//     inp.value = window.editor.getValue();
+					//     document.forms['MyForm'].submit();
+					// });
+				
+					window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+						if (e.matches) {
+							monaco.editor.setTheme("vs-dark");
+						} else {
+							monaco.editor.setTheme("vs");
+						}
+					})
+				
+					const divElem = document.getElementById('monaco-editor');
+					const resizeObserver = new ResizeObserver(entries => {
+						window.editor.layout();
+					});
+					resizeObserver.observe(divElem);
+				});		  
+					</script>
+				<?php
+			}
+			add_action('admin_footer', 'ti_custom_javascript');
 
+			// ********************************************************************************************************************************************
+			// End of Add Monaco Script
+			// ********************************************************************************************************************************************
+			
 			echo $e;
 
 			wp_enqueue_style( "codemirror-curr-style-{$field['theme']}", "{$dir}js/" . ACFCF_CODEMIRROR_VERSION . "/theme/{$field['theme']}.css" );
+
+	
 		}
 
 
@@ -229,11 +297,15 @@ if ( ! class_exists( 'acf_code_field' ) ) :
 			wp_enqueue_script( 'acf-input-code-field-codemirror-selection', "{$dir}js/" . ACFCF_CODEMIRROR_VERSION . "/addon/selection/mark-selection.js", array( 'wp-codemirror' ) );
 			wp_enqueue_script( 'acf-input-code-field-codemirror-matchbrackets', "{$dir}js/" . ACFCF_CODEMIRROR_VERSION . "/addon/edit/matchbrackets.js", array( 'wp-codemirror' ) );
 			wp_enqueue_script( 'acf-input-code-field-codemirror-autorefresh', "{$dir}js/" . ACFCF_CODEMIRROR_VERSION . "/addon/display/autorefresh.js", array( 'wp-codemirror' ) );
+			
+			// Monaco Scritps
+			wp_enqueue_script( 'monaco-library', "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.27.0/min/vs/loader.min.js", array( 'wp-codemirror' ) );
+			// wp_enqueue_script( 'monaco', "{$dir}js/monaco.js", array( 'wp-codemirror' ) );
+			wp_enqueue_style( 'acf-input-code-field-css', "{$dir}css/monaco.css" );
 
 			// register & include CSS
 			wp_enqueue_style( 'acf-input-code-field-css', "{$dir}css/input.css" );
 
-			// wp_enqueue_script( 'acf-input-code-field-monaco-editor', "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.27.0/min/vs/loader.min.js", array( 'wp-codemirror' ) );
 			// Register the script
 			wp_register_script( 'acf-input-code-field-input', "{$dir}js/input.js" );
 
@@ -614,3 +686,7 @@ if ( ! class_exists( 'acf_code_field' ) ) :
 
 	// class_exists check
 endif;
+
+
+
+

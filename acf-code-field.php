@@ -1,9 +1,9 @@
 <?php
 
 /*
-Plugin Name: Advanced Custom Fields: ACF Code Field
+Plugin Name: Advanced Custom Fields: ACF DP Code Field
 Plugin URI: http://petetasker.com
-Description: ACF Code field using Codemirror
+Description: ACF Code field using Monaco Editor
 Version: 1.8
 Author: Peter Tasker
 Author URI: http://petetasker.com
