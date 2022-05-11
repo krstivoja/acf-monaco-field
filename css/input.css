@@ -5,3 +5,10 @@
 .acf-table {
 	table-layout: fixed;
 }
+
+
+#editor{
+	max-width: 900px !important;
+	max-height: 600px !important;
+	position: relative;
+}

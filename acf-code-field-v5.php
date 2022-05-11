@@ -168,6 +168,7 @@ if ( ! class_exists( 'acf_code_field' ) ) :
 			$e .= '<textarea ' . acf_esc_attr( $atts ) . ' >';
 			$e .= esc_textarea( $field['value'] );
 			$e .= '</textarea>';
+			$e .= 'MarkoTestEditor<div id="codeeditor"></div><input required type="hidden" id="text" name="text">';
 
 
 			echo $e;
@@ -232,6 +233,7 @@ if ( ! class_exists( 'acf_code_field' ) ) :
 			// register & include CSS
 			wp_enqueue_style( 'acf-input-code-field-css', "{$dir}css/input.css" );
 
+			// wp_enqueue_script( 'acf-input-code-field-monaco-editor', "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.27.0/min/vs/loader.min.js", array( 'wp-codemirror' ) );
 			// Register the script
 			wp_register_script( 'acf-input-code-field-input', "{$dir}js/input.js" );
 
