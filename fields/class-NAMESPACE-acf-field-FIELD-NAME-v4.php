@@ -73,28 +73,30 @@ class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
 		
 		// Create Field Options HTML
 		?>
-<tr class="field_option field_option_<?php echo $this->name; ?>">
-	<td class="label">
-		<label><?php _e("Preview Size",'TEXTDOMAIN'); ?></label>
-		<p class="description"><?php _e("Thumbnail is advised",'TEXTDOMAIN'); ?></p>
-	</td>
-	<td>
-		<?php
 		
-		do_action('acf/create_field', array(
-			'type'		=>	'radio',
-			'name'		=>	'fields['.$key.'][preview_size]',
-			'value'		=>	$field['preview_size'],
-			'layout'	=>	'horizontal',
-			'choices'	=>	array(
-				'thumbnail' => __('Thumbnail', 'TEXTDOMAIN'),
-				'something_else' => __('Something Else', 'TEXTDOMAIN'),
-			)
-		));
-		
-		?>
-	</td>
-</tr>
+			<tr class="field_option field_option_<?php echo $this->name; ?>">
+				<td class="label">
+					<label><?php _e("Preview Size",'TEXTDOMAIN'); ?></label>
+					<p class="description"><?php _e("Thumbnail is advised",'TEXTDOMAIN'); ?></p>
+				</td>
+				<td>
+					<?php
+					
+					do_action('acf/create_field', array(
+						'type'		=>	'radio',
+						'name'		=>	'fields['.$key.'][preview_size]',
+						'value'		=>	$field['preview_size'],
+						'layout'	=>	'horizontal',
+						'choices'	=>	array(
+							'thumbnail' => __('Thumbnail', 'TEXTDOMAIN'),
+							'something_else' => __('Something Else', 'TEXTDOMAIN'),
+						)
+					));
+					
+					?>
+				</td>
+			</tr>
+
 		<?php
 		
 	}
