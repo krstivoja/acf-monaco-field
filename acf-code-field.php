@@ -1,12 +1,12 @@
 <?php
 
 /*
-Plugin Name: Advanced Custom Fields: ACF DP Code Field
-Plugin URI: http://petetasker.com
+Plugin Name: Advanced Custom Fields: DP Code Field with Monaco Editor
+Plugin URI: https://dplugins.com/
 Description: ACF Code field using Monaco Editor
-Version: 1.8
-Author: Peter Tasker
-Author URI: http://petetasker.com
+Version: 0.0.1
+Author: Marko Krstic & Sumit Singh
+Author URI: https://dplugins.com/
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */

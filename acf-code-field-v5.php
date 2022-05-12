@@ -234,6 +234,15 @@ if ( ! class_exists( 'acf_code_field' ) ) :
 							});
 							resizeObserver.observe(divElem);
 						});		 
+
+				
+						function saveI() 
+						{
+							getVal = editor.getValue()
+							// get the value of the data
+							alert(getVal)
+						}
+						document.getElementById('monaco-editor').onclick = saveI;
 						
 						// let src = window.editor.getValue()
 						// src.addEventListener('keyup', change, false);
