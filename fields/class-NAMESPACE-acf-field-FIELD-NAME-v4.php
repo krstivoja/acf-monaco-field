@@ -5,10 +5,10 @@ if( ! defined( 'ABSPATH' ) ) exit;
 
 
 // check if class already exists
-if( !class_exists('NAMESPACE_acf_field_MONACO_FIELD') ) :
+if( !class_exists('NAMESPACE_acf_field_FIELD_NAME') ) :
 
 
-class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
+class NAMESPACE_acf_field_FIELD_NAME extends acf_field {
 	
 	// vars
 	var $settings, // will hold info such as dir / path
@@ -27,7 +27,7 @@ class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
 	function __construct( $settings )
 	{
 		// vars
-		$this->name = 'MONACO_FIELD';
+		$this->name = 'FIELD_NAME';
 		$this->label = __('FIELD_LABEL');
 		$this->category = __("Basic",'TEXTDOMAIN'); // Basic, Content, Choice, etc
 		$this->defaults = array(
@@ -73,30 +73,28 @@ class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
 		
 		// Create Field Options HTML
 		?>
+<tr class="field_option field_option_<?php echo $this->name; ?>">
+	<td class="label">
+		<label><?php _e("Preview Size",'TEXTDOMAIN'); ?></label>
+		<p class="description"><?php _e("Thumbnail is advised",'TEXTDOMAIN'); ?></p>
+	</td>
+	<td>
+		<?php
 		
-			<tr class="field_option field_option_<?php echo $this->name; ?>">
-				<td class="label">
-					<label><?php _e("Preview Size",'TEXTDOMAIN'); ?></label>
-					<p class="description"><?php _e("Thumbnail is advised",'TEXTDOMAIN'); ?></p>
-				</td>
-				<td>
-					<?php
-					
-					do_action('acf/create_field', array(
-						'type'		=>	'radio',
-						'name'		=>	'fields['.$key.'][preview_size]',
-						'value'		=>	$field['preview_size'],
-						'layout'	=>	'horizontal',
-						'choices'	=>	array(
-							'thumbnail' => __('Thumbnail', 'TEXTDOMAIN'),
-							'something_else' => __('Something Else', 'TEXTDOMAIN'),
-						)
-					));
-					
-					?>
-				</td>
-			</tr>
-
+		do_action('acf/create_field', array(
+			'type'		=>	'radio',
+			'name'		=>	'fields['.$key.'][preview_size]',
+			'value'		=>	$field['preview_size'],
+			'layout'	=>	'horizontal',
+			'choices'	=>	array(
+				'thumbnail' => __('Thumbnail', 'TEXTDOMAIN'),
+				'something_else' => __('Something Else', 'TEXTDOMAIN'),
+			)
+		));
+		
+		?>
+	</td>
+</tr>
 		<?php
 		
 	}
@@ -375,7 +373,7 @@ class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
 
 
 // initialize
-new NAMESPACE_acf_field_MONACO_FIELD( $this->settings );
+new NAMESPACE_acf_field_FIELD_NAME( $this->settings );
 
 
 // class_exists check

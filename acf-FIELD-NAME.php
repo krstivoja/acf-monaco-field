@@ -1,10 +1,10 @@
 <?php
 
 /*
-Plugin Name: Advanced Custom Fields: NEW Monaco Field
+Plugin Name: Advanced Custom Fields: Monaco NEW
 Plugin URI: PLUGIN_URL
 Description: SHORT_DESCRIPTION
-Version: 1.0.0
+Version: 0.0.1
 Author: AUTHOR_NAME
 Author URI: AUTHOR_URL
 License: GPLv2 or later
@@ -16,9 +16,9 @@ if( ! defined( 'ABSPATH' ) ) exit;
 
 
 // check if class already exists
-if( !class_exists('NAMESPACE_acf_plugin_MONACO_FIELD') ) :
+if( !class_exists('NAMESPACE_acf_plugin_FIELD_NAME') ) :
 
-class NAMESPACE_acf_plugin_MONACO_FIELD {
+class NAMESPACE_acf_plugin_FIELD_NAME {
 	
 	// vars
 	var $settings;
@@ -85,7 +85,7 @@ class NAMESPACE_acf_plugin_MONACO_FIELD {
 
 
 // initialize
-new NAMESPACE_acf_plugin_MONACO_FIELD();
+new NAMESPACE_acf_plugin_FIELD_NAME();
 
 
 // class_exists check

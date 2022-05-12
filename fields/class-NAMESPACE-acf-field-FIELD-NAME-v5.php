@@ -5,10 +5,10 @@ if( ! defined( 'ABSPATH' ) ) exit;
 
 
 // check if class already exists
-if( !class_exists('NAMESPACE_acf_field_MONACO_FIELD') ) :
+if( !class_exists('NAMESPACE_acf_field_FIELD_NAME') ) :
 
 
-class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
+class NAMESPACE_acf_field_FIELD_NAME extends acf_field {
 	
 	
 	/*
@@ -30,21 +30,21 @@ class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
 		*  name (string) Single word, no spaces. Underscores allowed
 		*/
 		
-		$this->name = 'acf_monaco_editor';
+		$this->name = 'acf_code_field';
 		
 		
 		/*
 		*  label (string) Multiple words, can include spaces, visible when selecting a field type
 		*/
 		
-		$this->label = __('Monaco Editor', 'acf_monaco_editor');
+		$this->label = __( 'Code Area Field', 'acf-code-field' );
 		
 		
 		/*
 		*  category (string) basic | content | choice | relational | jquery | layout | CUSTOM GROUP NAME
 		*/
 		
-		$this->category = 'Code tools';
+		$this->category = 'Code Fields';
 		
 		
 		/*
@@ -53,13 +53,12 @@ class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
 		
 		$this->defaults = array(
 			'font_size'	=> 14,
-			'theme' => 'vs-light',
 		);
 		
 		
 		/*
 		*  l10n (array) Array of strings that are used in JavaScript. This allows JS strings to be translated in PHP and loaded via:
-		*  var message = acf._e('MONACO_FIELD', 'error');
+		*  var message = acf._e('FIELD_NAME', 'error');
 		*/
 		
 		$this->l10n = array(
@@ -92,9 +91,8 @@ class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
 	*  @param	$field (array) the $field being edited
 	*  @return	n/a
 	*/
-	
 	function render_field_settings( $field ) {
-		
+
 		/*
 		*  acf_render_field_setting
 		*
@@ -104,17 +102,73 @@ class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
 		*  More than one setting can be added by copy/paste the above code.
 		*  Please note that you must also have a matching $defaults value for the field name (font_size)
 		*/
-		
+
+
+		// default_value
 		acf_render_field_setting( $field, array(
-			'label'			=> __('Font Size','acf'),
-			'instructions'	=> __('Customise the input font size','acf'),
+			'label'        => __( 'Default Value', 'acf' ),
+			'instructions' => __( 'Appears when creating a new post', 'acf' ),
+			'type'         => 'textarea',
+			'name'         => 'default_value',
+		) );
+
+
+		// placeholder
+		acf_render_field_setting( $field, array(
+			'label'        => __( 'Placeholder Text', 'acf' ),
+			'instructions' => __( 'Appears within the input', 'acf' ),
+			'type'         => 'text',
+			'name'         => 'placeholder',
+		) );
+
+		acf_render_field_setting( $field, array(
+			'label'        => __( 'Editor mode', 'acf' ),
+			'instructions' => __( '', 'acf' ),
+			'type'         => 'select',
+			'name'         => 'mode',
+			'choices'      => array(
+				'htmlmixed'               => __( "HTML Mixed", 'acf' ),
+				'javascript'              => __( "JavaScript", 'acf' ),
+				'text/html'               => __( "HTML", 'acf' ),
+				'css'                     => __( "CSS", 'acf' ),
+				'application/x-httpd-php' => __( "PHP", 'acf' ),
+			),
+		) );
+
+		$util = new ACF_Code_Field_Util();
+
+		acf_render_field_setting( $field, array(
+			'label'        => __( 'Editor theme', 'acf' ),
+			'instructions' => __( 'Themes can be previewed on the <a href="https://codemirror.net/demo/theme.html#default" target="_blank">codemirror website</a>', 'acf' ),
+			'type'         => 'select',
+			'name'         => 'theme',
+			'choices'      => array(
+				'Visual Studio'               => __( "vs-light", 'acf' ),
+				'Visual Studio Dark'          => __( "vs-dark", 'acf' ),
+			),
+		) );
+
+
+		/*
+		*  acf_render_field_setting
+		*
+		*  This function will create a setting for your field. Simply pass the $field parameter and an array of field settings.
+		*  The array of settings does not require a `value` or `prefix`; These settings are found from the $field array.
+		*
+		*  More than one setting can be added by copy/paste the above code.
+		*  Please note that you must also have a matching $defaults value for the field name (font_size)
+		*/
+		/*
+		acf_render_field_setting( $field, array(
+			'label'			=> __('Font Size','TEXTDOMAIN'),
+			'instructions'	=> __('Customise the input font size','TEXTDOMAIN'),
 			'type'			=> 'number',
 			'name'			=> 'font_size',
 			'prepend'		=> 'px',
 		));
+		*/
 
 	}
-	
 	
 	
 	/*
@@ -134,96 +188,166 @@ class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
 	
 	function render_field( $field ) {
 		
+
+
+		$dir       = plugin_dir_url( __FILE__ );
+		$safe_slug = str_replace( "-", "_", $field['id'] );
+		// vars
+		$o = array( 'id', 'class', 'name', 'placeholder', 'mode', 'theme' );
+		$e = '';
+
+
+		// populate atts
+		$atts = array();
+		foreach ( $o as $k ) {
+			$atts[ $k ] = $field[ $k ];
+		}
+
+		$atts['class'] = 'acf-code-field-box';
+
+		$e .= '<div id="MyForm">';
+		$e .= '<div id="monaco-editor"></div>';
+		$e .= '<textarea id="monaco-textarea" ' . acf_esc_attr( $atts ) . ' >';
+		$e .= esc_textarea( $field['value'] );
+		$e .= '</textarea>';
+		$e .= '</div>';
+
+
+		// $e .= '<textarea ' . acf_esc_attr( $atts ) . ' >';
+		// $e .= esc_textarea( $field['value'] );
+		// $e .= '</textarea>';
+		echo '<script>var value = "'.$field['value'].'";</script>';
+		
+		// ********************************************************************************************************************************************
+		// Add Monaco Script
+		// ********************************************************************************************************************************************
+
+		function ti_custom_javascript( ) {
+			?>
+				<style>
+					#MyForm{
+						position: relative;
+						border: 10px solid rgb(174, 0, 0);
+					}
+
+					#monaco-editor {
+						border: 10px solid rgba(0, 9, 174, 0.246);
+						height: 50vh; 
+						max-height: 500px; 
+						width: 100%;
+						box-sizing: border-box; 
+						overflow: hidden;
+						/* position: relative; */
+					}
+				</style>	
+
+				
+				<script>
+				
+				  // your javscript code goes here markoscript
+		
+					require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.27.0/min/vs' }});
+			
+					require(['vs/editor/editor.main'], function() {
+						let theme = "vs";
+						if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+							theme = "vs-dark";
+						}
+						window.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
+							// value: "# Document Header\n\nEnter some text, submit the form with Ctrl-s or Cmd-s shortcut.",
+							value: value,
+							language: 'html',
+							// lineNumbers: "off",
+							wordWrap: "bounded",
+							wordWrapColumn: 100,
+							wrappingIndent: "same",
+							fontSize: 16,
+							roundedSelection: false,
+							scrollBeyondLastLine: false,
+							quickSuggestions: false,
+							minimap: {enabled:false},
+							theme: theme,
+						});
+					
+						// window.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
+						//     var inp = document.getElementById('text');
+						//     inp.value = window.editor.getValue();
+						//     document.forms['MyForm'].submit();
+						// });
+					
+						window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+							if (e.matches) {
+								monaco.editor.setTheme("vs-dark");
+							} else {
+								monaco.editor.setTheme("vs");
+							}
+						})
+					
+						const divElem = document.getElementById('monaco-editor');
+						const resizeObserver = new ResizeObserver(entries => {
+							window.editor.layout();
+						});
+						resizeObserver.observe(divElem);
+					});		 
+
+			
+					function saveI() 
+					{
+						getVal = editor.getValue()
+						// get the value of the data
+						alert(getVal)
+					}
+					document.getElementById('monaco-editor').onclick = saveI;
+					
+					// let src = window.editor.getValue()
+					// src.addEventListener('keyup', change, false);
+					
+					// function change(e) {
+					// 	document.getElementById("monaco-textarea").setAttribute('value', e.target.value);
+
+					// 	$("#code").val(value);
+					// }
+					
+					// let src = document.getElementById("monaco-editor");
+					// src.addEventListener('keyup', change, false);
+					
+					// function change(e) {
+					// 	document.getElementById("monaco-textarea").setAttribute('value', e.target.value);
+					// }
+
+				</script>
+			<?php
+		}
+		add_action('admin_footer', 'ti_custom_javascript');
+
+		// ********************************************************************************************************************************************
+		// End of Add Monaco Script
+		// ********************************************************************************************************************************************
+		
+		echo $e;
 		
 		/*
 		*  Review the data of $field.
 		*  This will show what data is available
 		*/
 		
+		/*
 		echo '<pre>';
 			print_r( $field );
 		echo '</pre>';
+		*/
 		
 		
 		/*
 		*  Create a simple text input using the 'font_size' setting.
 		*/
 		
+		/*
 		?>
-
-		<!-- 
-			<input type="text" name="<?php echo esc_attr($field['name']) ?>" value="<?php echo esc_attr($field['value']) ?>" style="font-size:<?php echo $field['font_size'] ?>px;" />
-		-->	
-
-		<style>
-			#MyForm{
-				position: relative;
-				border: 10px solid rgb(174, 0, 0);
-			}
-
-			#monaco-editor {
-				border: 10px solid rgba(0, 9, 174, 0.246);
-				height: 50vh; 
-				max-height: 500px; 
-				width: 100%;
-				box-sizing: border-box; 
-				overflow: hidden;
-				/* position: relative; */
-			}
-		</style>
-
-		<div id="MyForm">
-			<div id="monaco-editor"></div>
-			<textarea id="monaco-textarea" name="<?php echo esc_attr($field['name']) ?>" ><?php echo esc_attr($field['value']) ?></textarea>
-		</div>	
-		
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.27.0/min/vs/loader.min.js" integrity="sha512-SExj71Cw3B9C9EE8BC/ad3AKia5zQXDj/2SM4THgkeKh5GIFZhKM/R3uclUG8YZwJrjcVhydAlIHmfNvsBCKZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-		<script>
-			require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.27.0/min/vs' }});
-				
-				require(['vs/editor/editor.main'], function() {
-					let theme = "vs";
-					// if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-					// 	theme = "vs-dark";
-					// }
-					window.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
-						value: "# Document Header\n\nEnter some text, submit the form with Ctrl-s or Cmd-s shortcut.",
-						language: 'html',
-						// lineNumbers: "off",
-						wordWrap: "bounded",
-						wordWrapColumn: 100,
-						wrappingIndent: "same",
-						fontSize: 16,
-						roundedSelection: false,
-						scrollBeyondLastLine: false,
-						quickSuggestions: false,
-						minimap: {enabled:false},
-						theme: theme,
-					});
-				
-					// window.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
-					//     var inp = document.getElementById('text');
-					//     inp.value = window.editor.getValue();
-					//     document.forms['MyForm'].submit();
-					// });
-				
-					window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
-						if (e.matches) {
-							monaco.editor.setTheme("vs-dark");
-						} else {
-							monaco.editor.setTheme("vs");
-						}
-					})
-				
-					const divElem = document.getElementById('monaco-editor');
-					const resizeObserver = new ResizeObserver(entries => {
-						window.editor.layout();
-					});
-					resizeObserver.observe(divElem);
-				});
-		</script>
-
+		<input type="text" name="<?php echo esc_attr($field['name']) ?>" value="<?php echo esc_attr($field['value']) ?>" style="font-size:<?php echo $field['font_size'] ?>px;" />
 		<?php
+		*/
+
 
 	}
 	
@@ -242,10 +366,15 @@ class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
 	*  @return	n/a
 	*/
 
-	/*
+	
 	
 	function input_admin_enqueue_scripts() {
+
+
+		// Monaco Scritps
+		wp_enqueue_script( 'monaco-library', "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.27.0/min/vs/loader.min.js", array( 'wp-codemirror' ) );
 		
+		/*
 		// vars
 		$url = $this->settings['url'];
 		$version = $this->settings['version'];
@@ -259,10 +388,11 @@ class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
 		// register & include CSS
 		wp_register_style('TEXTDOMAIN', "{$url}assets/css/input.css", array('acf-input'), $version);
 		wp_enqueue_style('TEXTDOMAIN');
+		*/
 		
 	}
 	
-	*/
+	
 	
 	
 	/*
@@ -631,7 +761,7 @@ class NAMESPACE_acf_field_MONACO_FIELD extends acf_field {
 
 
 // initialize
-new NAMESPACE_acf_field_MONACO_FIELD( $this->settings );
+new NAMESPACE_acf_field_FIELD_NAME( $this->settings );
 
 
 // class_exists check
